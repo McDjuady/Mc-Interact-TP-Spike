@@ -24,7 +24,6 @@ public class PL extends JavaPlugin implements Listener {
     @EventHandler(ignoreCancelled = false)
     public void onInteract(PlayerInteractEvent e) {
         if (e.getHand() != EquipmentSlot.HAND || e.getItem() == null || e.getItem().getType() != Material.EYE_OF_ENDER || !(e.getAction() == Action.RIGHT_CLICK_BLOCK || e.getAction() == Action.RIGHT_CLICK_AIR)) {
-            this.getLogger().info("Skip");
             return;
         }
         e.setCancelled(true);
