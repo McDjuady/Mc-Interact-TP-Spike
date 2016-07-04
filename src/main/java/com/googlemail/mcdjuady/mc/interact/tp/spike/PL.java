@@ -5,6 +5,12 @@
  */
 package com.googlemail.mcdjuady.mc.interact.tp.spike;
 
+import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.ProtocolLib;
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.events.PacketAdapter;
+import com.comphenix.protocol.events.PacketEvent;
+import java.util.logging.Level;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
@@ -26,6 +32,7 @@ public class PL extends JavaPlugin implements Listener {
         if (e.getHand() != EquipmentSlot.HAND || e.getItem() == null || e.getItem().getType() != Material.EYE_OF_ENDER || !(e.getAction() == Action.RIGHT_CLICK_BLOCK || e.getAction() == Action.RIGHT_CLICK_AIR)) {
             return;
         }
+        getLogger().info("Use");
         e.setCancelled(true);
         e.getPlayer().teleport(e.getPlayer().getWorld().getHighestBlockAt(e.getPlayer().getWorld().getSpawnLocation()).getLocation());
         ItemStack item = e.getPlayer().getInventory().getItemInMainHand();
@@ -39,6 +46,13 @@ public class PL extends JavaPlugin implements Listener {
     @Override
     public void onEnable() {
         Bukkit.getPluginManager().registerEvents(this, this);
+        ProtocolLibrary.getProtocolManager().addPacketListener(new PacketAdapter(this, PacketType.Play.Client.USE_ITEM) {
+            @Override
+            public void onPacketReceiving(PacketEvent event) {
+                PL.this.getLogger().log(Level.INFO, "Use received! Hand: {0}", (event.getPacket().getHands().read(0)));
+            }
+            
+        });
     }
 
 }
