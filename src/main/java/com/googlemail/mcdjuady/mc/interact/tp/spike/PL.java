@@ -29,20 +29,29 @@ public class PL extends JavaPlugin implements Listener {
 
     @EventHandler(ignoreCancelled = false)
     public void onInteract(PlayerInteractEvent e) {
-        if (e.getHand() != EquipmentSlot.HAND || e.getItem() == null || e.getItem().getType() != Material.EYE_OF_ENDER || !(e.getAction() == Action.RIGHT_CLICK_BLOCK || e.getAction() == Action.RIGHT_CLICK_AIR)) {
+        if (e.getItem() == null || e.getItem().getType() != Material.EYE_OF_ENDER || !(e.getAction() == Action.RIGHT_CLICK_BLOCK || e.getAction() == Action.RIGHT_CLICK_AIR)) {
             return;
         }
-        getLogger().log(Level.INFO, "Use!");
+        getLogger().log(Level.INFO, "Use! {0}", e.getHand());
         e.setCancelled(true);
         e.getPlayer().teleport(e.getPlayer().getWorld().getHighestBlockAt(e.getPlayer().getWorld().getSpawnLocation()).getLocation());
-        ItemStack item = e.getPlayer().getInventory().getItemInMainHand();
-        if (item.getAmount() == 1) {
-            e.getPlayer().getInventory().setItemInMainHand(null);
-        } else {
-            item.setAmount(item.getAmount() - 1);
+        if (e.getHand() == EquipmentSlot.HAND) {
+            ItemStack item = e.getPlayer().getInventory().getItemInMainHand();
+            if (item.getAmount() == 1) {
+                e.getPlayer().getInventory().setItemInMainHand(null);
+            } else {
+                item.setAmount(item.getAmount() - 1);
+            }
+        } else if (e.getHand() == EquipmentSlot.OFF_HAND) {
+            ItemStack item = e.getPlayer().getInventory().getItemInOffHand();
+            if (item.getAmount() == 1) {
+                e.getPlayer().getInventory().setItemInOffHand(null);
+            } else {
+                item.setAmount(item.getAmount() - 1);
+            }
         }
     }
-    
+
     @Override
     public void onEnable() {
         Bukkit.getPluginManager().registerEvents(this, this);
@@ -51,14 +60,14 @@ public class PL extends JavaPlugin implements Listener {
             public void onPacketReceiving(PacketEvent event) {
                 PL.this.getLogger().log(Level.INFO, "Use received! Hand: {0}", (event.getPacket().getHands().read(0)));
             }
-            
+
         });
         ProtocolLibrary.getProtocolManager().addPacketListener(new PacketAdapter(this, PacketType.Play.Client.BLOCK_PLACE) {
             @Override
             public void onPacketReceiving(PacketEvent event) {
                 PL.this.getLogger().info("Place block");
             }
-            
+
         });
     }
 
