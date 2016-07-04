@@ -32,7 +32,7 @@ public class PL extends JavaPlugin implements Listener {
         if (e.getHand() != EquipmentSlot.HAND || e.getItem() == null || e.getItem().getType() != Material.EYE_OF_ENDER || !(e.getAction() == Action.RIGHT_CLICK_BLOCK || e.getAction() == Action.RIGHT_CLICK_AIR)) {
             return;
         }
-        getLogger().info("Use");
+        getLogger().log(Level.INFO, "Use!");
         e.setCancelled(true);
         e.getPlayer().teleport(e.getPlayer().getWorld().getHighestBlockAt(e.getPlayer().getWorld().getSpawnLocation()).getLocation());
         ItemStack item = e.getPlayer().getInventory().getItemInMainHand();
@@ -42,7 +42,7 @@ public class PL extends JavaPlugin implements Listener {
             item.setAmount(item.getAmount() - 1);
         }
     }
-
+    
     @Override
     public void onEnable() {
         Bukkit.getPluginManager().registerEvents(this, this);
@@ -50,6 +50,13 @@ public class PL extends JavaPlugin implements Listener {
             @Override
             public void onPacketReceiving(PacketEvent event) {
                 PL.this.getLogger().log(Level.INFO, "Use received! Hand: {0}", (event.getPacket().getHands().read(0)));
+            }
+            
+        });
+        ProtocolLibrary.getProtocolManager().addPacketListener(new PacketAdapter(this, PacketType.Play.Client.BLOCK_PLACE) {
+            @Override
+            public void onPacketReceiving(PacketEvent event) {
+                PL.this.getLogger().info("Place block");
             }
             
         });
